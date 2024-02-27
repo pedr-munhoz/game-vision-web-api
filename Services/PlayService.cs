@@ -2,48 +2,71 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using game_vision_web_api.Infrastructure.Database;
 using game_vision_web_api.Models.Entities;
 using game_vision_web_api.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace game_vision_web_api.Services;
 
-public class PlayService
+public class PlayService(GameVisionDbContext dbContext, GoogleDriveService googleDriveService)
 {
+    private readonly GameVisionDbContext _dbContext = dbContext;
+    private readonly GoogleDriveService _googleDriveService = googleDriveService;
+
     public async Task<List<Play>> Get(long gameId)
     {
-        var entities = new List<Play>();
+        var entities = await _dbContext.Plays.Where(x => x.GameId == gameId).ToListAsync();
 
         return entities;
     }
 
-    public async Task<Play> Update(long id, PlayViewModel model)
+    public async Task<(Play? result, string? error)> Update(long id, PlayViewModel model)
     {
-        var entity = new Play
-        {
-            PlayNumber = model.PlayNumber,
-            Offense = model.Offense,
-            Defense = model.Defense,
-            Down = model.Down,
-            Distance = model.Distance,
-            Formation = model.Formation,
-            Name = model.Name,
-            Yards = model.Yards,
-            Result = model.Result,
-            FirstDown = model.FirstDown,
-            Touchdown = model.Touchdown,
-            Notes = model.Notes,
-            Game = new Game { Name = "placeholder" },
-        };
+        var entity = await _dbContext.Plays.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-        return entity;
+        if (entity is null)
+            return (result: null, error: "Play not found");
+
+        entity.PlayNumber = model.PlayNumber;
+        entity.Offense = model.Offense;
+        entity.Defense = model.Defense;
+        entity.Down = model.Down;
+        entity.Distance = model.Distance;
+        entity.Formation = model.Formation;
+        entity.Name = model.Name;
+        entity.Yards = model.Yards;
+        entity.Result = model.Result;
+        entity.FirstDown = model.FirstDown;
+        entity.Touchdown = model.Touchdown;
+        entity.Notes = model.Notes;
+
+        await _dbContext.SaveChangesAsync();
+
+        return (result: entity, error: null);
     }
 
-    public async Task<int> Load(long gameId, string folderId)
+    public async Task<(int count, string? error)> Load(long gameId, string folderId)
     {
-        var entities = new List<Play>();
+        var game = await _dbContext.Games.Where(x => x.Id == gameId).FirstOrDefaultAsync();
 
-        var count = entities.Count;
+        if (game is null)
+            return (count: 0, error: "Game not found");
 
-        return count;
+        var (fileIds, fileListingError) = await _googleDriveService.ListFileIds(folderId);
+
+        if (fileListingError is not null)
+            return (count: 0, error: fileListingError);
+
+        var entities = fileIds.Select(x => new Play
+        {
+            Game = game,
+            FileId = x
+        });
+
+        await _dbContext.Plays.AddRangeAsync(entities);
+        await _dbContext.SaveChangesAsync();
+
+        return (count: entities.Count(), error: null);
     }
 }

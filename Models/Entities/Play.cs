@@ -3,6 +3,7 @@ namespace game_vision_web_api.Models.Entities;
 public class Play
 {
     public long Id { get; set; }
+    public string? FileId { get; set; }
     public int? PlayNumber { get; set; }
     public string? Offense { get; set; }
     public string? Defense { get; set; }
@@ -15,5 +16,6 @@ public class Play
     public bool? FirstDown { get; set; }
     public bool? Touchdown { get; set; }
     public string? Notes { get; set; }
+    public long GameId { get; set; }
     public Game Game { get; set; } = null!;
 }

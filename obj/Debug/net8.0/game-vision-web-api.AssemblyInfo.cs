@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("game-vision-web-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5044d4ddb57de3504e81ff36770fd2601adc2c00")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e79a72fc0ee225f1dbd88de9ccb55e854fabd8e8")]
 [assembly: System.Reflection.AssemblyProductAttribute("game-vision-web-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("game-vision-web-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
