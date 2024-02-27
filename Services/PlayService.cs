@@ -58,15 +58,30 @@ public class PlayService(GameVisionDbContext dbContext, GoogleDriveService googl
         if (fileListingError is not null)
             return (count: 0, error: fileListingError);
 
+        var createdPlays = await GeneratePlays(game, fileIds);
+
+        return (count: createdPlays, error: null);
+    }
+
+    private async Task<int> GeneratePlays(Game game, List<string> fileIds)
+    {
+        int lastPlayNumber = await _dbContext.Plays
+           .Where(x => x.GameId == game.Id)
+           .Select(x => x.PlayNumber)
+           .MaxAsync() ?? 0;
+
+        lastPlayNumber++;
+
         var entities = fileIds.Select(x => new Play
         {
             Game = game,
-            FileId = x
+            FileId = x,
+            PlayNumber = lastPlayNumber++
         });
 
         await _dbContext.Plays.AddRangeAsync(entities);
         await _dbContext.SaveChangesAsync();
 
-        return (count: entities.Count(), error: null);
+        return entities.Count();
     }
 }
