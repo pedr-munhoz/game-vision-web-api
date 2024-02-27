@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using game_vision_web_api.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace game_vision_web_api.Infrastructure.Database;
 

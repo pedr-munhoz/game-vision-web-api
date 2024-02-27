@@ -1,6 +1,15 @@
+using game_vision_web_api.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var connectionString = builder.Configuration["GameVisionDbConnectionString"];
+
+builder.Services.AddDbContext<GameVisionDbContext>(options =>
+    options.UseNpgsql(connectionString)
+);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
