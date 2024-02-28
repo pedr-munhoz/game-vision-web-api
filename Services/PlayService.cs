@@ -65,18 +65,10 @@ public class PlayService(GameVisionDbContext dbContext, GoogleDriveService googl
 
     private async Task<int> GeneratePlays(Game game, List<string> fileIds)
     {
-        int lastPlayNumber = await _dbContext.Plays
-           .Where(x => x.GameId == game.Id)
-           .Select(x => x.PlayNumber)
-           .MaxAsync() ?? 0;
-
-        lastPlayNumber++;
-
         var entities = fileIds.Select(x => new Play
         {
             Game = game,
             FileId = x,
-            PlayNumber = lastPlayNumber++
         });
 
         await _dbContext.Plays.AddRangeAsync(entities);
