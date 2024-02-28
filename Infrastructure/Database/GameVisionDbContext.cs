@@ -12,7 +12,7 @@ public class GameVisionDbContext(DbContextOptions options) : DbContext(options)
     {
         builder.Entity<Play>()
                     .HasOne(p => p.Game)
-                    .WithMany()
+                    .WithMany(p => p.Plays)
                     .HasForeignKey(p => p.GameId);
     }
 }
