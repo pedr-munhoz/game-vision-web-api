@@ -19,7 +19,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<GameService>();
 builder.Services.AddTransient<PlayService>();
-builder.Services.AddTransient<GoogleDriveService>();
 
 var app = builder.Build();
 

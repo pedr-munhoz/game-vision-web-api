@@ -27,16 +27,4 @@ public class PlayController(PlayService playService) : ControllerBase
 
         return Ok(entity);
     }
-
-    [HttpPost]
-    [Route("load")]
-    public async Task<IActionResult> LoadPlays([FromQuery] string folderId, long gameId)
-    {
-        var (count, error) = await _playService.Load(gameId, folderId);
-
-        if (error is not null)
-            return UnprocessableEntity(error);
-
-        return Ok($"{count} Plays loaded to the game");
-    }
 }
