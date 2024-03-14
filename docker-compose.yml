@@ -7,17 +7,16 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123456
       - POSTGRES_DB=game_vision_db
-    expose:
-      - "5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   web-api:
     build: .
     environment:
       GameVisionDbConnectionString: "Host=postgresserver;Port=5432;Database=game_vision_db;Username=postgres;Password=123456;Pooling=false;"
     ports:
-      - "8090:80"
+      - "8000:8080"
+      - "8090:8081"
     links:
       - postgresserver
     depends_on:
@@ -25,6 +24,3 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-
-volumes:
-  pgdata:

@@ -13,6 +13,7 @@ RUN dotnet publish "game-vision-web-api.csproj" -c Release -o out
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-EXPOSE 80
+EXPOSE 8080
+EXPOSE 8081
 COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "game-vision-web-api.dll"]
