@@ -19,6 +19,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<GameService>();
 builder.Services.AddTransient<PlayService>();
+builder.Services.AddTransient<S3Service>();
 
 var app = builder.Build();
 

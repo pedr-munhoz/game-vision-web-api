@@ -14,6 +14,9 @@ services:
     build: .
     environment:
       GameVisionDbConnectionString: "Host=postgresserver;Port=5432;Database=game_vision_db;Username=postgres;Password=123456;Pooling=false;"
+      AwsS3AccessKey: ""
+      AwsS3SecretKey: ""
+      AwsS3RootBucket: "game-vision-dev"
     ports:
       - "8000:8080"
       - "8090:8081"

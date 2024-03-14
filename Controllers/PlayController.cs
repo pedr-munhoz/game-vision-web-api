@@ -19,6 +19,18 @@ public class PlayController(PlayService playService) : ControllerBase
         return Ok(entities);
     }
 
+    [HttpPost]
+    [Route("{gameId}")]
+    public async Task<IActionResult> CreatePlay([FromRoute] long gameId)
+    {
+        var (_, error) = await _playService.Create(gameId);
+
+        if (error is not null)
+            return UnprocessableEntity(error);
+
+        return NoContent();
+    }
+
     [HttpPut]
     [Route("{id}")]
     public async Task<IActionResult> UpdatePlay([FromRoute] long id, [FromBody] PlayViewModel model)

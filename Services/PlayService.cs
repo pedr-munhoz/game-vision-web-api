@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace game_vision_web_api.Services;
 
-public class PlayService(GameVisionDbContext dbContext)
+public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
 {
     private readonly GameVisionDbContext _dbContext = dbContext;
+    private readonly S3Service _s3Service = s3Service;
 
     public async Task<List<Play>> Get(long gameId)
     {
@@ -36,6 +37,29 @@ public class PlayService(GameVisionDbContext dbContext)
         entity.Touchdown = model.Touchdown;
         entity.Notes = model.Notes;
 
+        await _dbContext.SaveChangesAsync();
+
+        return (result: entity, error: null);
+    }
+
+    public async Task<(Play? result, string? error)> Create(long gameId)
+    {
+        var game = await _dbContext.Games.Where(x => x.Id == gameId).FirstOrDefaultAsync();
+
+        if (game is null)
+            return (result: null, error: "Game not found");
+
+        var fileId = Guid.NewGuid().ToString();
+
+        await _s3Service.UploadFile(fileId, game.Name);
+
+        var entity = new Play
+        {
+            Game = game,
+            FileId = fileId,
+        };
+
+        await _dbContext.Plays.AddAsync(entity);
         await _dbContext.SaveChangesAsync();
 
         return (result: entity, error: null);
