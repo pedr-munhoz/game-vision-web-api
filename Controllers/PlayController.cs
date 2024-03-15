@@ -21,14 +21,21 @@ public class PlayController(PlayService playService) : ControllerBase
 
     [HttpPost]
     [Route("{gameId}")]
-    public async Task<IActionResult> CreatePlay([FromRoute] long gameId)
+    public async Task<IActionResult> CreatePlay([FromRoute] long gameId, IFormFile video)
     {
-        var (_, error) = await _playService.Create(gameId);
+        if (video == null || video.Length == 0)
+            return BadRequest("No file uploaded");
 
-        if (error is not null)
+        // Check if the file is in MP4 format
+        if (video.ContentType != "video/mp4")
+            return BadRequest("Only MP4 files are allowed");
+
+        var (play, error) = await _playService.Create(gameId, video);
+
+        if (play is null || error is not null)
             return UnprocessableEntity(error);
 
-        return NoContent();
+        return Ok($"https://d1x95g1lk7jxvh.cloudfront.net/{play.GameId}/{play.FileId}");
     }
 
     [HttpPut]

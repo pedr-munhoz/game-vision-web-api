@@ -42,7 +42,7 @@ public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
         return (result: entity, error: null);
     }
 
-    public async Task<(Play? result, string? error)> Create(long gameId)
+    public async Task<(Play? result, string? error)> Create(long gameId, IFormFile video)
     {
         var game = await _dbContext.Games.Where(x => x.Id == gameId).FirstOrDefaultAsync();
 
@@ -51,7 +51,10 @@ public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
 
         var fileId = Guid.NewGuid().ToString();
 
-        await _s3Service.UploadFile(fileId, game.Name);
+        var success = await _s3Service.UploadFile(fileId, game.Id.ToString(), video, "video/mp4");
+
+        if (!success)
+            return (result: null, error: "Failed to upload video");
 
         var entity = new Play
         {
