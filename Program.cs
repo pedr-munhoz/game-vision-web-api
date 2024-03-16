@@ -1,6 +1,7 @@
 using game_vision_web_api.Infrastructure.Database;
 using game_vision_web_api.Services;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,13 @@ builder.Services.AddTransient<PlayService>();
 builder.Services.AddTransient<S3Service>();
 
 var app = builder.Build();
+
+app.UseCors(policy => policy
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true)
+                .AllowCredentials()
+                .WithExposedHeaders("Content-Disposition"));
 
 DatabaseManagementService.MigrationInitialisation(app);
 
