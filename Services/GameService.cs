@@ -28,4 +28,11 @@ public class GameService(GameVisionDbContext dbContext)
 
         return entities;
     }
+
+    public async Task<Game?> Get(long id)
+    {
+        var entity = await _dbContext.Games.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+        return entity;
+    }
 }

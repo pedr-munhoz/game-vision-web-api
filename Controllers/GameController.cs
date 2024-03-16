@@ -26,4 +26,16 @@ public class GameController(GameService gameService) : ControllerBase
 
         return Ok(entities);
     }
+
+    [HttpGet]
+    [Route("{id}")]
+    public async Task<IActionResult> Get([FromRoute] long id)
+    {
+        var entity = await _gameService.Get(id);
+
+        if (entity == null)
+            return NotFound();
+
+        return Ok(entity);
+    }
 }
