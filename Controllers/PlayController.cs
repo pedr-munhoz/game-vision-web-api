@@ -11,7 +11,7 @@ public class PlayController(PlayService playService) : ControllerBase
     private readonly PlayService _playService = playService;
 
     [HttpGet]
-    [Route("{gameId}")]
+    [Route("game/{gameId}")]
     public async Task<IActionResult> GetPlays([FromRoute] long gameId)
     {
         var entities = await _playService.Get(gameId);
@@ -20,7 +20,7 @@ public class PlayController(PlayService playService) : ControllerBase
     }
 
     [HttpPost]
-    [Route("{gameId}")]
+    [Route("game/{gameId}")]
     public async Task<IActionResult> CreatePlay([FromRoute] long gameId, IFormFile video)
     {
         if (video == null || video.Length == 0)
@@ -36,6 +36,21 @@ public class PlayController(PlayService playService) : ControllerBase
             return UnprocessableEntity(error);
 
         return Ok($"https://d1x95g1lk7jxvh.cloudfront.net/{play.GameId}/{play.FileId}");
+    }
+
+    [HttpPost]
+    [Route("game/{gameId}/batch")]
+    public async Task<IActionResult> CreatePlays([FromRoute] long gameId, IFormFileCollection videos)
+    {
+        if (videos.Any(video => video == null || video.Length == 0))
+            return BadRequest("No file uploaded");
+
+        if (videos.Any(video => video.ContentType != "video/mp4"))
+            return BadRequest("Only MP4 files are allowed");
+
+        var result = await _playService.Create(gameId, videos);
+
+        return Ok(result);
     }
 
     [HttpPut]

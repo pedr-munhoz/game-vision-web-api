@@ -42,6 +42,20 @@ public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
         return (result: entity, error: null);
     }
 
+    public async Task<List<(Play? result, string? error)>> Create(long gameId, IFormFileCollection videos)
+    {
+        var listResult = new List<(Play?, string?)>();
+
+        foreach (var video in videos)
+        {
+            var (result, error) = await Create(gameId, video);
+            listResult.Add((result, error));
+        }
+
+        return listResult;
+    }
+
+
     public async Task<(Play? result, string? error)> Create(long gameId, IFormFile video)
     {
         var game = await _dbContext.Games.Where(x => x.Id == gameId).FirstOrDefaultAsync();
