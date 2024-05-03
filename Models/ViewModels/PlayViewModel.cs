@@ -12,11 +12,25 @@ public class PlayViewModel
     public string? Defense { get; set; }
     public int? Down { get; set; }
     public int? Distance { get; set; }
-    public string? Formation { get; set; }
-    public string? Name { get; set; }
+    public string? Goal { get; set; }
+    public string? Situation { get; set; }
     public int? Yards { get; set; }
+    public string? OffensiveFormation { get; set; }
+    public string? OffensivePlay { get; set; }
+    public string? DefensiveFormation { get; set; }
+    public string? DefensivePlay { get; set; }
     public string? Result { get; set; }
+    public string? Penalty { get; set; }
     public bool? FirstDown { get; set; }
     public bool? Touchdown { get; set; }
-    public string? Notes { get; set; }
+    public bool? Safety { get; set; }
+    public string? Runner { get; set; }
+    public string? Passer { get; set; }
+    public string? Target { get; set; }
+    public string? TargetPosition { get; set; }
+    public string? DefensiveTarget { get; set; }
+    public string? Tackler { get; set; }
+    public string? Interceptor { get; set; }
+    public string? OfensiveNotes { get; set; }
+    public string? DefensiveNotes { get; set; }
 }

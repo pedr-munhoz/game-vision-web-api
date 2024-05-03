@@ -29,13 +29,27 @@ public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
         entity.Defense = model.Defense;
         entity.Down = model.Down;
         entity.Distance = model.Distance;
-        entity.Formation = model.Formation;
-        entity.Name = model.Name;
+        entity.Goal = model.Goal;
+        entity.Situation = model.Situation;
         entity.Yards = model.Yards;
+        entity.OffensiveFormation = model.OffensiveFormation;
+        entity.OffensivePlay = model.OffensivePlay;
+        entity.DefensiveFormation = model.DefensiveFormation;
+        entity.DefensivePlay = model.DefensivePlay;
         entity.Result = model.Result;
+        entity.Penalty = model.Penalty;
         entity.FirstDown = model.FirstDown;
         entity.Touchdown = model.Touchdown;
-        entity.Notes = model.Notes;
+        entity.Safety = model.Safety;
+        entity.Runner = model.Runner;
+        entity.Passer = model.Passer;
+        entity.Target = model.Target;
+        entity.TargetPosition = model.TargetPosition;
+        entity.DefensiveTarget = model.DefensiveTarget;
+        entity.Tackler = model.Tackler;
+        entity.Interceptor = model.Interceptor;
+        entity.OfensiveNotes = model.OfensiveNotes;
+        entity.DefensiveNotes = model.DefensiveNotes;
 
         await _dbContext.SaveChangesAsync();
 
