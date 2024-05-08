@@ -18,9 +18,9 @@ public class Play
     public string? DefensivePlay { get; set; }
     public string? Result { get; set; }
     public string? Penalty { get; set; }
-    public bool? FirstDown { get; set; }
-    public bool? Touchdown { get; set; }
-    public bool? Safety { get; set; }
+    public bool FirstDown { get; set; }
+    public bool Touchdown { get; set; }
+    public bool Safety { get; set; }
     public string? Runner { get; set; }
     public string? Passer { get; set; }
     public string? Target { get; set; }
