@@ -1,7 +1,6 @@
 using game_vision_web_api.Infrastructure.Database;
 using game_vision_web_api.Services;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
