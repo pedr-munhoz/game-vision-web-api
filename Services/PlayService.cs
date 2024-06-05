@@ -10,7 +10,7 @@ public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
     private readonly GameVisionDbContext _dbContext = dbContext;
     private readonly S3Service _s3Service = s3Service;
 
-    public async Task<List<Play>> Get(long gameId)
+    public async Task<List<Play>> GetByGameId(long gameId)
     {
         var entities = await _dbContext.Plays.Where(x => x.GameId == gameId).ToListAsync();
 
@@ -68,7 +68,6 @@ public class PlayService(GameVisionDbContext dbContext, S3Service s3Service)
 
         return listResult;
     }
-
 
     public async Task<(Play? result, string? error)> Create(long gameId, IFormFile video)
     {
