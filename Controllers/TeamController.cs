@@ -41,10 +41,10 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpPost]
-    [Route("{id}/game")]
-    public async Task<IActionResult> PostGame([FromRoute] long id, [FromBody] GameViewModel model)
+    [Route("{prefix}/game")]
+    public async Task<IActionResult> PostGame([FromRoute] string prefix, [FromBody] GameViewModel model)
     {
-        var (entity, error) = await _gameService.Create(model, id);
+        var (entity, error) = await _gameService.Create(model, prefix);
 
         if (entity is null || error is not null)
             return UnprocessableEntity(error);
@@ -53,10 +53,10 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpGet]
-    [Route("{id}/game")]
-    public async Task<IActionResult> GetGames([FromRoute] long id)
+    [Route("{prefix}/game")]
+    public async Task<IActionResult> GetGames([FromRoute] string prefix)
     {
-        var entities = await _gameService.GetByTeamId(id);
+        var entities = await _gameService.GetByTeamPrefix(prefix);
 
         return Ok(entities);
     }
