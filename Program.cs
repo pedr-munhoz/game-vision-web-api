@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddTransient<TeamService>();
 builder.Services.AddTransient<GameService>();
 builder.Services.AddTransient<PlayService>();
 builder.Services.AddTransient<S3Service>();
