@@ -1,4 +1,6 @@
+using AutoMapper;
 using game_vision_web_api.Infrastructure.Database;
+using game_vision_web_api.Models.MapperProfiles;
 using game_vision_web_api.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +23,13 @@ builder.Services.AddTransient<TeamService>();
 builder.Services.AddTransient<GameService>();
 builder.Services.AddTransient<PlayService>();
 builder.Services.AddTransient<S3Service>();
+
+builder.Services.AddAutoMapper(p =>
+    _ = new MapperConfiguration(q =>
+    {
+        p.AddProfile(new EntityToDtoProfile());
+    })
+);
 
 var app = builder.Build();
 
