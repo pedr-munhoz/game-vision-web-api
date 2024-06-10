@@ -11,14 +11,15 @@ public class GameService(GameVisionDbContext dbContext)
 
     public async Task<(Game? result, string? error)> Create(GameViewModel model, string prefix)
     {
-        var game = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();
+        var team = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();
 
-        if (game is null)
+        if (team is null)
             return (result: null, error: "Team not found");
 
         var entity = new Game
         {
             Name = model.Name,
+            Team = team,
         };
 
         await _dbContext.Games.AddAsync(entity);
