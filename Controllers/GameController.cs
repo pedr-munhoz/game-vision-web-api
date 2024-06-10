@@ -1,4 +1,3 @@
-using game_vision_web_api.Models.ViewModels;
 using game_vision_web_api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,21 +14,24 @@ public class GameController(GameService gameService, PlayService playService) : 
     [Route("{id}")]
     public async Task<IActionResult> Get([FromRoute] long id)
     {
-        var entity = await _gameService.GetById(id);
+        var (result, error) = await _gameService.GetById(id);
 
-        if (entity == null)
-            return NotFound();
+        if (result == null || error == null)
+            return UnprocessableEntity(error);
 
-        return Ok(entity);
+        return Ok(result);
     }
 
     [HttpGet]
     [Route("{id}/play")]
     public async Task<IActionResult> GetPlays([FromRoute] long id)
     {
-        var entities = await _playService.GetByGameId(id);
+        var (result, error) = await _playService.GetByGameId(id);
 
-        return Ok(entities);
+        if (result == null || error == null)
+            return UnprocessableEntity(error);
+
+        return Ok(result);
     }
 
     [HttpPost]
@@ -43,25 +45,10 @@ public class GameController(GameService gameService, PlayService playService) : 
         if (video.ContentType != "video/mp4")
             return BadRequest("Only MP4 files are allowed");
 
-        var (play, error) = await _playService.Create(id, video);
+        var (result, error) = await _playService.Create(id, video);
 
-        if (play is null || error is not null)
+        if (result is null || error is not null)
             return UnprocessableEntity(error);
-
-        return Ok($"https://d1x95g1lk7jxvh.cloudfront.net/{play.GameId}/{play.FileId}");
-    }
-
-    [HttpPost]
-    [Route("{id}/play/batch")]
-    public async Task<IActionResult> PostPlays([FromRoute] long id, IFormFileCollection videos)
-    {
-        if (videos.Any(video => video == null || video.Length == 0))
-            return BadRequest("No file uploaded");
-
-        if (videos.Any(video => video.ContentType != "video/mp4"))
-            return BadRequest("Only MP4 files are allowed");
-
-        var result = await _playService.Create(id, videos);
 
         return Ok(result);
     }

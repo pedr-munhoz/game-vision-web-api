@@ -15,29 +15,36 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     [Route("")]
     public async Task<IActionResult> Post([FromBody] TeamViewModel model)
     {
-        var entity = await _teamService.Create(model);
-        return Ok(entity);
+        var (result, error) = await _teamService.Create(model);
+
+        if (result is null || error is not null)
+            return UnprocessableEntity(error);
+
+        return Ok(result);
     }
 
     [HttpGet]
     [Route("")]
     public async Task<IActionResult> Get()
     {
-        var entities = await _teamService.Get();
+        var (result, error) = await _teamService.Get();
 
-        return Ok(entities);
+        if (result is null || error is not null)
+            return UnprocessableEntity(error);
+
+        return Ok(result);
     }
 
     [HttpGet]
     [Route("{id}")]
     public async Task<IActionResult> Get([FromRoute] long id)
     {
-        var entity = await _teamService.Get(id);
+        var (result, error) = await _teamService.Get(id);
 
-        if (entity == null)
-            return NotFound();
+        if (result is null || error is not null)
+            return UnprocessableEntity(error);
 
-        return Ok(entity);
+        return Ok(result);
     }
 
     [HttpPost]
@@ -56,8 +63,11 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     [Route("{prefix}/game")]
     public async Task<IActionResult> GetGames([FromRoute] string prefix)
     {
-        var entities = await _gameService.GetByTeamPrefix(prefix);
+        var (result, error) = await _gameService.GetByTeamPrefix(prefix);
 
-        return Ok(entities);
+        if (result is null || error is not null)
+            return UnprocessableEntity(error);
+
+        return Ok(result);
     }
 }
