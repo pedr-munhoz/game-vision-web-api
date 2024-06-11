@@ -33,9 +33,9 @@ public class TeamService(GameVisionDbContext dbContext, IMapper mapper)
         return (entities.Select(_mapper.Map<TeamDTO>).ToList(), null);
     }
 
-    public async Task<(TeamDTO?, string?)> Get(long id)
+    public async Task<(TeamDTO?, string?)> Get(string prefix)
     {
-        var entity = await _dbContext.Teams.Where(x => x.Id == id).FirstOrDefaultAsync();
+        var entity = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();
 
         return (_mapper.Map<TeamDTO>(entity), null);
     }

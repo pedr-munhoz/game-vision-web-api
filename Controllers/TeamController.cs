@@ -36,10 +36,10 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpGet]
-    [Route("{id}")]
-    public async Task<IActionResult> Get([FromRoute] long id)
+    [Route("{prefix}")]
+    public async Task<IActionResult> Get([FromRoute] string prefix)
     {
-        var (result, error) = await _teamService.Get(id);
+        var (result, error) = await _teamService.Get(prefix);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);
