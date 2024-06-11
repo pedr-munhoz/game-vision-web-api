@@ -14,8 +14,11 @@ public class PlayController(PlayService playService) : ControllerBase
     [Route("{id}")]
     public async Task<IActionResult> UpdatePlay([FromRoute] long id, [FromBody] PlayViewModel model)
     {
-        var entity = await _playService.Update(id, model);
+        var (result, error) = await _playService.Update(id, model);
 
-        return Ok(entity);
+        if (result is null || error is not null)
+            return UnprocessableEntity(error);
+
+        return Ok(result);
     }
 }

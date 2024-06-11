@@ -16,7 +16,7 @@ public class GameController(GameService gameService, PlayService playService) : 
     {
         var (result, error) = await _gameService.GetById(id);
 
-        if (result == null || error == null)
+        if (result is null || error is not null)
             return UnprocessableEntity(error);
 
         return Ok(result);
@@ -28,7 +28,7 @@ public class GameController(GameService gameService, PlayService playService) : 
     {
         var (result, error) = await _playService.GetByGameId(id);
 
-        if (result == null || error == null)
+        if (result is null || error is not null)
             return UnprocessableEntity(error);
 
         return Ok(result);
