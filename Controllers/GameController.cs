@@ -1,10 +1,12 @@
 using game_vision_web_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace game_vision_web_api.Controllers;
 
 [ApiController]
 [Route("api/game")]
+[Authorize]
 public class GameController(GameService gameService, PlayService playService) : ControllerBase
 {
     private readonly GameService _gameService = gameService;

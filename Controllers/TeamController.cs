@@ -1,11 +1,13 @@
 using game_vision_web_api.Models.ViewModels;
 using game_vision_web_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace game_vision_web_api.Controllers;
 
 [ApiController]
 [Route("api/team")]
+[Authorize]
 public class TeamController(TeamService teamService, GameService gameService) : ControllerBase
 {
     private readonly TeamService _teamService = teamService;
