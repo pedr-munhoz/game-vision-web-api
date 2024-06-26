@@ -1,9 +1,10 @@
 using game_vision_web_api.Models.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace game_vision_web_api.Infrastructure.Database;
 
-public class GameVisionDbContext(DbContextOptions options) : DbContext(options)
+public class GameVisionDbContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
     public DbSet<Team> Teams { get; set; } = null!;
     public DbSet<Game> Games { get; set; } = null!;
@@ -11,6 +12,8 @@ public class GameVisionDbContext(DbContextOptions options) : DbContext(options)
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        base.OnModelCreating(builder);
+
         builder.Entity<Game>()
                     .HasOne(p => p.Team)
                     .WithMany(p => p.Games)

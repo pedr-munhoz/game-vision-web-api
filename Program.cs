@@ -1,7 +1,9 @@
 using AutoMapper;
 using game_vision_web_api.Infrastructure.Database;
+using game_vision_web_api.Models.Entities;
 using game_vision_web_api.Models.MapperProfiles;
 using game_vision_web_api.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
+
+builder.Services.AddIdentityCore<User>()
+    .AddEntityFrameworkStores<GameVisionDbContext>()
+    .AddApiEndpoints();
 
 builder.Services.AddTransient<TeamService>();
 builder.Services.AddTransient<GameService>();
@@ -48,6 +57,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.MapIdentityApi<User>();
 
 app.UseAuthorization();
 
