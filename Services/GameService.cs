@@ -12,9 +12,17 @@ public class GameService(GameVisionDbContext dbContext, IMapper mapper)
     private readonly GameVisionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<(GameDTO?, string?)> Create(GameViewModel model, string teamPrefix)
+    public async Task<(GameDTO?, string?)> Create(GameViewModel model, string? userId)
     {
-        var team = await _dbContext.Teams.Where(x => x.Prefix == teamPrefix).FirstOrDefaultAsync();
+        var user = await _dbContext.Users
+            .Include(x => x.Team)
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+            return (null, "User not found");
+
+        var team = user.Team;
 
         if (team is null)
             return (null, "Team not found");
@@ -31,16 +39,23 @@ public class GameService(GameVisionDbContext dbContext, IMapper mapper)
         return (_mapper.Map<GameDTO>(entity), null);
     }
 
-    public async Task<(List<GameDTO>?, string?)> GetByTeamPrefix(string teamPrefix)
+    public async Task<(List<GameDTO>?, string?)> GetByUserTeam(string? userId)
     {
-        var team = await _dbContext.Teams.Where(x => x.Prefix == teamPrefix).FirstOrDefaultAsync();
+        var user = await _dbContext.Users
+            .Include(x => x.Team)
+#nullable disable
+            .ThenInclude(x => x.Games)
+#nullable restore
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
 
-        if (team is null)
+        if (user is null)
+            return (null, "User not found");
+
+        if (user.Team is null)
             return (null, "Team not found");
 
-        var entities = await _dbContext.Games.Include(x => x.Team).Where(x => x.Team.Prefix == teamPrefix).ToListAsync();
-
-        return (entities.Select(_mapper.Map<GameDTO>).ToList(), null);
+        return (user.Team.Games.Select(_mapper.Map<GameDTO>).ToList(), null);
     }
 
     public async Task<(GameDTO?, string?)> GetById(long id)

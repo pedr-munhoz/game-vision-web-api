@@ -33,13 +33,6 @@ public class TeamService(GameVisionDbContext dbContext, IMapper mapper)
         return (entities.Select(_mapper.Map<TeamDTO>).ToList(), null);
     }
 
-    public async Task<(TeamDTO?, string?)> Get(string prefix)
-    {
-        var entity = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();
-
-        return (_mapper.Map<TeamDTO>(entity), null);
-    }
-
     public async Task<(TeamDTO?, string?)> LinkUser(string prefix, string? userId)
     {
         var team = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();

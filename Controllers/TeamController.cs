@@ -14,30 +14,6 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     private readonly TeamService _teamService = teamService;
     private readonly GameService _gameService = gameService;
 
-    [HttpPost]
-    [Route("")]
-    public async Task<IActionResult> Post([FromBody] TeamViewModel model)
-    {
-        var (result, error) = await _teamService.Create(model);
-
-        if (result is null || error is not null)
-            return UnprocessableEntity(error);
-
-        return Ok(result);
-    }
-
-    [HttpGet]
-    [Route("all")]
-    public async Task<IActionResult> GetAll()
-    {
-        var (result, error) = await _teamService.Get();
-
-        if (result is null || error is not null)
-            return UnprocessableEntity(error);
-
-        return Ok(result);
-    }
-
     [HttpGet]
     [Route("")]
     public async Task<IActionResult> Get()
@@ -52,10 +28,11 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpPost]
-    [Route("{prefix}/game")]
-    public async Task<IActionResult> PostGame([FromRoute] string prefix, [FromBody] GameViewModel model)
+    [Route("game")]
+    public async Task<IActionResult> PostGame([FromBody] GameViewModel model)
     {
-        var (entity, error) = await _gameService.Create(model, prefix);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var (entity, error) = await _gameService.Create(model, userId);
 
         if (entity is null || error is not null)
             return UnprocessableEntity(error);
@@ -64,10 +41,11 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpGet]
-    [Route("{prefix}/game")]
-    public async Task<IActionResult> GetGames([FromRoute] string prefix)
+    [Route("game")]
+    public async Task<IActionResult> GetGames()
     {
-        var (result, error) = await _gameService.GetByTeamPrefix(prefix);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var (result, error) = await _gameService.GetByUserTeam(userId);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);
