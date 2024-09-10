@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using game_vision_web_api.Models.ViewModels;
 using game_vision_web_api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -26,8 +27,8 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpGet]
-    [Route("")]
-    public async Task<IActionResult> Get()
+    [Route("all")]
+    public async Task<IActionResult> GetAll()
     {
         var (result, error) = await _teamService.Get();
 
@@ -38,10 +39,11 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     }
 
     [HttpGet]
-    [Route("{prefix}")]
-    public async Task<IActionResult> Get([FromRoute] string prefix)
+    [Route("")]
+    public async Task<IActionResult> Get()
     {
-        var (result, error) = await _teamService.Get(prefix);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var (result, error) = await _teamService.GetByUser(userId);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);
@@ -66,6 +68,20 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     public async Task<IActionResult> GetGames([FromRoute] string prefix)
     {
         var (result, error) = await _gameService.GetByTeamPrefix(prefix);
+
+        if (result is null || error is not null)
+            return UnprocessableEntity(error);
+
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Route("{prefix}/user")]
+    public async Task<IActionResult> LinkUser([FromRoute] string prefix)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var (result, error) = await _teamService.LinkUser(prefix, userId);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);

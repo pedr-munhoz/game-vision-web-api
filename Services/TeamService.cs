@@ -39,4 +39,38 @@ public class TeamService(GameVisionDbContext dbContext, IMapper mapper)
 
         return (_mapper.Map<TeamDTO>(entity), null);
     }
+
+    public async Task<(TeamDTO?, string?)> LinkUser(string prefix, string? userId)
+    {
+        var team = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();
+
+        if (team is null)
+            return (null, "Team not found");
+
+        var user = await _dbContext.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+
+        if (user is null)
+            return (null, "User not found");
+
+        user.Team = team;
+        await _dbContext.SaveChangesAsync();
+
+        return (_mapper.Map<TeamDTO>(team), null);
+    }
+
+    public async Task<(TeamDTO?, string?)> GetByUser(string? userId)
+    {
+        var user = await _dbContext.Users
+            .Include(x => x.Team)
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+            return (null, "User not found");
+
+        if (user.Team is null)
+            return (null, "User does not have a team");
+
+        return (_mapper.Map<TeamDTO>(user.Team), null);
+    }
 }

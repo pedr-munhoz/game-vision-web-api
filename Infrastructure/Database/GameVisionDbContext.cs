@@ -23,5 +23,10 @@ public class GameVisionDbContext(DbContextOptions options) : IdentityDbContext<U
                     .HasOne(p => p.Game)
                     .WithMany(p => p.Plays)
                     .HasForeignKey(p => p.GameId);
+
+        builder.Entity<User>()
+                    .HasOne(p => p.Team)
+                    .WithMany()
+                    .HasForeignKey(p => p.TeamId);
     }
 }

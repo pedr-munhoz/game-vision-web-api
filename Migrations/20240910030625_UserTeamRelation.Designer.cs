@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using game_vision_web_api.Infrastructure.Database;
@@ -11,9 +12,11 @@ using game_vision_web_api.Infrastructure.Database;
 namespace game_vision_web_api.Migrations
 {
     [DbContext(typeof(GameVisionDbContext))]
-    partial class GameVisionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240910030625_UserTeamRelation")]
+    partial class UserTeamRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
