@@ -11,5 +11,6 @@ public class EntityToDtoProfile : Profile
         CreateMap<Team, TeamDTO>();
         CreateMap<Game, GameDTO>();
         CreateMap<Play, PlayDTO>();
+        CreateMap<User, UserDTO>();
     }
 }

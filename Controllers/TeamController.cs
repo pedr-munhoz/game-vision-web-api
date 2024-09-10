@@ -74,18 +74,4 @@ public class TeamController(TeamService teamService, GameService gameService) : 
 
         return Ok(result);
     }
-
-    [HttpPost]
-    [Route("{prefix}/user")]
-    public async Task<IActionResult> LinkUser([FromRoute] string prefix)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var (result, error) = await _teamService.LinkUser(prefix, userId);
-
-        if (result is null || error is not null)
-            return UnprocessableEntity(error);
-
-        return Ok(result);
-    }
 }
