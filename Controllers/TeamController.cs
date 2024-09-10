@@ -19,6 +19,9 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     public async Task<IActionResult> Get()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
         var (result, error) = await _teamService.GetByUser(userId);
 
         if (result is null || error is not null)
@@ -32,6 +35,9 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     public async Task<IActionResult> PostGame([FromBody] GameViewModel model)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
         var (entity, error) = await _gameService.Create(model, userId);
 
         if (entity is null || error is not null)
@@ -45,6 +51,9 @@ public class TeamController(TeamService teamService, GameService gameService) : 
     public async Task<IActionResult> GetGames()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
         var (result, error) = await _gameService.GetByUserTeam(userId);
 
         if (result is null || error is not null)

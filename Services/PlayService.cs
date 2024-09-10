@@ -13,55 +13,90 @@ public class PlayService(GameVisionDbContext dbContext, IMapper mapper, S3Servic
     private readonly IMapper _mapper = mapper;
     private readonly S3Service _s3Service = s3Service;
 
-    public async Task<(List<PlayDTO>, string?)> GetByGameId(long gameId)
+    public async Task<(List<PlayDTO>?, string?)> GetByGameId(long gameId, string userId)
     {
-        var entities = await _dbContext.Plays.Where(x => x.GameId == gameId).ToListAsync();
+        var user = await _dbContext.Users
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
 
-        return (entities.Select(_mapper.Map<PlayDTO>).ToList(), null);
+        if (user is null)
+            return (null, "User not found");
+
+        var game = await _dbContext.Games
+            .Include(x => x.Plays)
+            .Where(x => x.Id == gameId)
+            .Where(x => x.TeamId == user.TeamId)
+            .FirstOrDefaultAsync();
+
+        if (game is null)
+            return (null, "Game not found");
+
+        return (game.Plays.Select(_mapper.Map<PlayDTO>).ToList(), null);
     }
 
-    public async Task<(Play?, string?)> Update(long id, PlayViewModel model)
+    public async Task<(Play?, string?)> Update(long id, PlayViewModel model, string userId)
     {
-        var entity = await _dbContext.Plays.Where(x => x.Id == id).FirstOrDefaultAsync();
+        var user = await _dbContext.Users
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
 
-        if (entity is null)
+        if (user is null)
+            return (null, "User not found");
+
+        var play = await _dbContext.Plays
+            .Include(x => x.Game)
+            .Where(x => x.Id == id)
+            .Where(x => x.Game.TeamId == user.TeamId)
+            .FirstOrDefaultAsync();
+
+        if (play is null)
             return (null, "Play not found");
 
-        entity.PlayNumber = model.PlayNumber;
-        entity.Offense = model.Offense;
-        entity.Defense = model.Defense;
-        entity.Down = model.Down;
-        entity.Distance = model.Distance;
-        entity.Goal = model.Goal;
-        entity.Situation = model.Situation;
-        entity.Yards = model.Yards;
-        entity.OffensiveFormation = model.OffensiveFormation;
-        entity.OffensivePlay = model.OffensivePlay;
-        entity.DefensiveFormation = model.DefensiveFormation;
-        entity.DefensivePlay = model.DefensivePlay;
-        entity.Result = model.Result;
-        entity.Penalty = model.Penalty;
-        entity.FirstDown = model.FirstDown;
-        entity.Touchdown = model.Touchdown;
-        entity.Safety = model.Safety;
-        entity.Runner = model.Runner;
-        entity.Passer = model.Passer;
-        entity.Target = model.Target;
-        entity.TargetPosition = model.TargetPosition;
-        entity.DefensiveTarget = model.DefensiveTarget;
-        entity.Tackler = model.Tackler;
-        entity.Interceptor = model.Interceptor;
-        entity.OfensiveNotes = model.OfensiveNotes;
-        entity.DefensiveNotes = model.DefensiveNotes;
+        play.PlayNumber = model.PlayNumber;
+        play.Offense = model.Offense;
+        play.Defense = model.Defense;
+        play.Down = model.Down;
+        play.Distance = model.Distance;
+        play.Goal = model.Goal;
+        play.Situation = model.Situation;
+        play.Yards = model.Yards;
+        play.OffensiveFormation = model.OffensiveFormation;
+        play.OffensivePlay = model.OffensivePlay;
+        play.DefensiveFormation = model.DefensiveFormation;
+        play.DefensivePlay = model.DefensivePlay;
+        play.Result = model.Result;
+        play.Penalty = model.Penalty;
+        play.FirstDown = model.FirstDown;
+        play.Touchdown = model.Touchdown;
+        play.Safety = model.Safety;
+        play.Runner = model.Runner;
+        play.Passer = model.Passer;
+        play.Target = model.Target;
+        play.TargetPosition = model.TargetPosition;
+        play.DefensiveTarget = model.DefensiveTarget;
+        play.Tackler = model.Tackler;
+        play.Interceptor = model.Interceptor;
+        play.OfensiveNotes = model.OfensiveNotes;
+        play.DefensiveNotes = model.DefensiveNotes;
 
         await _dbContext.SaveChangesAsync();
 
-        return (entity, null);
+        return (play, null);
     }
 
-    public async Task<(PlayDTO?, string?)> Create(long gameId, IFormFile video)
+    public async Task<(PlayDTO?, string?)> Create(long gameId, IFormFile video, string userId)
     {
-        var game = await _dbContext.Games.Where(x => x.Id == gameId).FirstOrDefaultAsync();
+        var user = await _dbContext.Users
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+            return (null, "User not found");
+
+        var game = await _dbContext.Games
+            .Where(x => x.Id == gameId)
+            .Where(x => x.TeamId == user.TeamId)
+            .FirstOrDefaultAsync();
 
         if (game is null)
             return (null, "Game not found");
@@ -73,15 +108,15 @@ public class PlayService(GameVisionDbContext dbContext, IMapper mapper, S3Servic
         if (!success)
             return (null, "Failed to upload video");
 
-        var entity = new Play
+        var play = new Play
         {
             Game = game,
             FileId = fileId,
         };
 
-        await _dbContext.Plays.AddAsync(entity);
+        await _dbContext.Plays.AddAsync(play);
         await _dbContext.SaveChangesAsync();
 
-        return (_mapper.Map<PlayDTO>(entity), null);
+        return (_mapper.Map<PlayDTO>(play), null);
     }
 }

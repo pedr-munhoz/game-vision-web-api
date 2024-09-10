@@ -14,26 +14,26 @@ public class TeamService(GameVisionDbContext dbContext, IMapper mapper)
 
     public async Task<(TeamDTO?, string?)> Create(TeamViewModel model)
     {
-        var entity = new Team
+        var team = new Team
         {
             Name = model.Name,
             Prefix = Guid.NewGuid().ToString(),
         };
 
-        await _dbContext.Teams.AddAsync(entity);
+        await _dbContext.Teams.AddAsync(team);
         await _dbContext.SaveChangesAsync();
 
-        return (_mapper.Map<TeamDTO>(entity), null);
+        return (_mapper.Map<TeamDTO>(team), null);
     }
 
     public async Task<(List<TeamDTO>, string?)> Get()
     {
-        var entities = await _dbContext.Teams.ToListAsync();
+        var teams = await _dbContext.Teams.ToListAsync();
 
-        return (entities.Select(_mapper.Map<TeamDTO>).ToList(), null);
+        return (teams.Select(_mapper.Map<TeamDTO>).ToList(), null);
     }
 
-    public async Task<(TeamDTO?, string?)> LinkUser(string prefix, string? userId)
+    public async Task<(TeamDTO?, string?)> LinkUser(string prefix, string userId)
     {
         var team = await _dbContext.Teams.Where(x => x.Prefix == prefix).FirstOrDefaultAsync();
 
@@ -51,7 +51,7 @@ public class TeamService(GameVisionDbContext dbContext, IMapper mapper)
         return (_mapper.Map<TeamDTO>(team), null);
     }
 
-    public async Task<(TeamDTO?, string?)> GetByUser(string? userId)
+    public async Task<(TeamDTO?, string?)> GetByUser(string userId)
     {
         var user = await _dbContext.Users
             .Include(x => x.Team)

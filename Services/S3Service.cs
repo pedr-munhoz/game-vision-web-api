@@ -19,7 +19,7 @@ namespace game_vision_web_api.Services
             // Set up S3 client
             var config = new AmazonS3Config
             {
-                RegionEndpoint = Amazon.RegionEndpoint.USEast1 // Change this to your bucket's region
+                RegionEndpoint = Amazon.RegionEndpoint.USEast1
             };
 
             using var client = new AmazonS3Client(credentials, config);

@@ -12,7 +12,7 @@ public class GameService(GameVisionDbContext dbContext, IMapper mapper)
     private readonly GameVisionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<(GameDTO?, string?)> Create(GameViewModel model, string? userId)
+    public async Task<(GameDTO?, string?)> Create(GameViewModel model, string userId)
     {
         var user = await _dbContext.Users
             .Include(x => x.Team)
@@ -22,24 +22,22 @@ public class GameService(GameVisionDbContext dbContext, IMapper mapper)
         if (user is null)
             return (null, "User not found");
 
-        var team = user.Team;
-
-        if (team is null)
+        if (user.Team is null)
             return (null, "Team not found");
 
-        var entity = new Game
+        var game = new Game
         {
             Name = model.Name,
-            Team = team,
+            Team = user.Team,
         };
 
-        await _dbContext.Games.AddAsync(entity);
+        await _dbContext.Games.AddAsync(game);
         await _dbContext.SaveChangesAsync();
 
-        return (_mapper.Map<GameDTO>(entity), null);
+        return (_mapper.Map<GameDTO>(game), null);
     }
 
-    public async Task<(List<GameDTO>?, string?)> GetByUserTeam(string? userId)
+    public async Task<(List<GameDTO>?, string?)> GetByUserTeam(string userId)
     {
         var user = await _dbContext.Users
             .Include(x => x.Team)
@@ -58,13 +56,24 @@ public class GameService(GameVisionDbContext dbContext, IMapper mapper)
         return (user.Team.Games.Select(_mapper.Map<GameDTO>).ToList(), null);
     }
 
-    public async Task<(GameDTO?, string?)> GetById(long id)
+    public async Task<(GameDTO?, string?)> GetById(long id, string userId)
     {
-        var entity = await _dbContext.Games.Where(x => x.Id == id).FirstOrDefaultAsync();
+        var user = await _dbContext.Users
+            .Include(x => x.Team)
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
 
-        if (entity is null)
+        if (user is null)
+            return (null, "User not found");
+
+        var game = await _dbContext.Games
+            .Where(x => x.Id == id)
+            .Where(x => x.TeamId == user.TeamId)
+            .FirstOrDefaultAsync();
+
+        if (game is null)
             return (null, "Game not found");
 
-        return (_mapper.Map<GameDTO>(entity), null);
+        return (_mapper.Map<GameDTO>(game), null);
     }
 }

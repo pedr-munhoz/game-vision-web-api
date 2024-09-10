@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using game_vision_web_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,11 @@ public class GameController(GameService gameService, PlayService playService) : 
     [Route("{id}")]
     public async Task<IActionResult> Get([FromRoute] long id)
     {
-        var (result, error) = await _gameService.GetById(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
+        var (result, error) = await _gameService.GetById(id, userId);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);
@@ -28,7 +33,11 @@ public class GameController(GameService gameService, PlayService playService) : 
     [Route("{id}/play")]
     public async Task<IActionResult> GetPlays([FromRoute] long id)
     {
-        var (result, error) = await _playService.GetByGameId(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
+        var (result, error) = await _playService.GetByGameId(id, userId);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);
@@ -40,6 +49,10 @@ public class GameController(GameService gameService, PlayService playService) : 
     [Route("{id}/play")]
     public async Task<IActionResult> PostPlay([FromRoute] long id, IFormFile video)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
         if (video == null || video.Length == 0)
             return BadRequest("No file uploaded");
 
@@ -47,7 +60,7 @@ public class GameController(GameService gameService, PlayService playService) : 
         if (video.ContentType != "video/mp4")
             return BadRequest("Only MP4 files are allowed");
 
-        var (result, error) = await _playService.Create(id, video);
+        var (result, error) = await _playService.Create(id, video, userId);
 
         if (result is null || error is not null)
             return UnprocessableEntity(error);
