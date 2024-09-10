@@ -108,15 +108,45 @@ public class PlayService(GameVisionDbContext dbContext, IMapper mapper, S3Servic
         if (!success)
             return (null, "Failed to upload video");
 
-        var play = new Play
-        {
-            Game = game,
-            FileId = fileId,
-        };
+        var play = new Play(fileId, game);
 
         await _dbContext.Plays.AddAsync(play);
         await _dbContext.SaveChangesAsync();
 
         return (_mapper.Map<PlayDTO>(play), null);
+    }
+
+    public async Task<(bool, string?)> Delete(long id, string userId)
+    {
+        var user = await _dbContext.Users
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+            return (false, "User not found");
+
+        var play = await _dbContext.Plays
+            .Include(x => x.Game)
+            .Where(x => x.Id == id)
+            .Where(x => x.Game.TeamId == user.TeamId)
+            .FirstOrDefaultAsync();
+
+        if (play is null)
+            return (false, "Play not found");
+
+        return await Delete(play);
+    }
+
+    public async Task<(bool, string?)> Delete(Play play)
+    {
+        var success = await _s3Service.DeleteFile(play.FileId, play.GameId.ToString());
+
+        if (!success)
+            return (false, "Failed to remove video");
+
+        _dbContext.Plays.Remove(play);
+        await _dbContext.SaveChangesAsync();
+
+        return (true, null);
     }
 }

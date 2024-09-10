@@ -52,5 +52,44 @@ namespace game_vision_web_api.Services
 
             return true;
         }
+
+        public async Task<bool> DeleteFile(string key, string prefix)
+        {
+            string accessKey = _configuration["AwsS3AccessKey"] ?? "";
+            string secretKey = _configuration["AwsS3SecretKey"] ?? "";
+            string bucketName = _configuration["AwsS3RootBucket"] ?? "";
+
+            // Set up AWS credentials
+            var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
+
+            // Set up S3 client
+            var config = new AmazonS3Config
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.USEast1
+            };
+
+            using var client = new AmazonS3Client(credentials, config);
+            try
+            {
+                // Create a DeleteObjectRequest to delete the specified file
+                var request = new DeleteObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = $"{prefix}/{key}"
+                };
+                var response = await client.DeleteObjectAsync(request);
+
+                if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
+                    return false;
+            }
+            catch (AmazonS3Exception ex)
+            {
+                // Handle the exception as needed
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+
+            return true;
+        }
     }
 }
