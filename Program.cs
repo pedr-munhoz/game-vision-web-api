@@ -29,6 +29,7 @@ builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<GameVisionDbContext>()
     .AddApiEndpoints();
 
+builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<TeamService>();
 builder.Services.AddTransient<GameService>();
 builder.Services.AddTransient<PlayService>();

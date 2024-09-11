@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace game_vision_web_api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/admin")]
 [Authorize]
 public class AdminController(TeamService teamService, UserService userService) : ControllerBase
 {

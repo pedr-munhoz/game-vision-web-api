@@ -1,9 +1,9 @@
 namespace game_vision_web_api.Models.Entities;
 
-public class Play(string fileId, Game game)
+public class Play
 {
     public long Id { get; set; }
-    public string FileId { get; set; } = fileId;
+    public string FileId { get; set; } = string.Empty;
     public int? PlayNumber { get; set; }
     public string? Offense { get; set; }
     public string? Defense { get; set; }
@@ -31,5 +31,5 @@ public class Play(string fileId, Game game)
     public string? OfensiveNotes { get; set; }
     public string? DefensiveNotes { get; set; }
     public long GameId { get; set; }
-    public Game Game { get; set; } = game;
+    public Game Game { get; set; } = null!;
 }

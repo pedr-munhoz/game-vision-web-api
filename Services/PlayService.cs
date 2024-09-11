@@ -108,7 +108,11 @@ public class PlayService(GameVisionDbContext dbContext, IMapper mapper, S3Servic
         if (!success)
             return (null, "Failed to upload video");
 
-        var play = new Play(fileId, game);
+        var play = new Play
+        {
+            Game = game,
+            FileId = fileId,
+        };
 
         await _dbContext.Plays.AddAsync(play);
         await _dbContext.SaveChangesAsync();
