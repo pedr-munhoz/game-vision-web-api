@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace game_vision_web_api.Services;
 
-public class GameService(GameVisionDbContext dbContext, PlayService playService, IMapper mapper)
+public class GameService(GameVisionDbContext dbContext, IMapper mapper, S3Service s3Service)
 {
     private readonly GameVisionDbContext _dbContext = dbContext;
-    private readonly PlayService _playService = playService;
     private readonly IMapper _mapper = mapper;
+    private readonly S3Service _s3Service = s3Service;
 
     public async Task<(GameDTO?, string?)> Create(GameViewModel model, string userId)
     {
@@ -97,18 +97,11 @@ public class GameService(GameVisionDbContext dbContext, PlayService playService,
         if (game is null)
             return (false, "Game not found");
 
-        // Create a list of tasks for deleting all plays
-        var deletePlayTasks = game.Plays.Select(_playService.Delete);
+        var fileKeys = game.Plays.Select(x => x.FileId);
+        var succeeded = await _s3Service.DeleteFiles(keys: fileKeys, game.Id.ToString());
+        if (!succeeded)
+            return (false, "Failed to delete files");
 
-        // Run all tasks concurrently
-        var results = await Task.WhenAll(deletePlayTasks);
-        // Check if any result indicates a failure
-        bool anyFailed = results.Any(result => !result.Item1);
-
-        if (anyFailed)
-            return (false, "Failed to delete one or more plays");
-
-        // If all delete operations succeeded, delete the game
         _dbContext.Games.Remove(game);
         await _dbContext.SaveChangesAsync();
 

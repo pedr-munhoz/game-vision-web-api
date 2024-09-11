@@ -67,4 +67,20 @@ public class GameController(GameService gameService, PlayService playService) : 
 
         return Ok(result);
     }
+
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> Delete([FromRoute] long id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized();
+
+        var (success, error) = await _gameService.Delete(id, userId);
+
+        if (!success || error is not null)
+            return UnprocessableEntity(error);
+
+        return Ok(success);
+    }
 }
